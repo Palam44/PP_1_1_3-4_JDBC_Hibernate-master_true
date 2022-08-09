@@ -1,35 +1,49 @@
 package jm.task.core.jdbc.util;
 
-import jm.task.core.jdbc.model.User;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class Util {
-    // реализуйте настройку соединения с БД
-    private static final String url = "jdbc:mysql://localhost:3306/mysql";
-    private static final String username = "root";
-    private static final String password = "DANEKpalam55";
+    private static Connection conn = null;
+    private static Util instance = null;
 
-    public static Connection getConnection() throws ClassNotFoundException, SQLException {
-        Connection connection = null;
+    private Util() {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            connection = DriverManager.getConnection(url, username, password);
-            connection.setAutoCommit(false);
-            System.out.println("Successfully connected");
-        } catch (SQLException e) {
+            if (null == conn || conn.isClosed()) {
+                Properties props = getProps();
+                conn = DriverManager
+                        .getConnection(props.getProperty("db.url"), props.getProperty("db.username"), props.getProperty("db.password"));
+            }
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
-        return connection;
     }
 
-    public static SessionFactory getSessionFactory() {
-        Configuration configuration = new Configuration().addAnnotatedClass(User.class);
-        SessionFactory sessionFactory = configuration.buildSessionFactory();
-        return sessionFactory;
+    public static Util getInstance() {
+        if (null == instance) {
+            instance = new Util();
+        }
+        return instance;
+    }
+
+    public Connection getConnection() {
+        return conn;
+    }
+
+    private static Properties getProps() throws IOException {
+        Properties props = new Properties();
+        try (InputStream in = Files.newInputStream(Paths.get(Util.class.getResource("/database.properties").toURI()))) {
+            props.load(in);
+            return props;
+        } catch (IOException | URISyntaxException e) {
+            throw new IOException("Database config file not found", e);
+        }
     }
 }
