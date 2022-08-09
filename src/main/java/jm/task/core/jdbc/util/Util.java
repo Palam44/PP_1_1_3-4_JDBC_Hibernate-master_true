@@ -14,25 +14,13 @@ public class Util {
     private static Connection conn = null;
     private static Util instance = null;
 
-//     private Util() {
-//        try {
-//            if (null == conn || conn.isClosed()) {
-//                Properties props = getProps();
-//                conn = DriverManager
-//                        .getConnection(props.getProperty("db.url"), props.getProperty("db.username"), props.getProperty("db.password"));
-//            }
-//        } catch (SQLException | IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-
     public static Connection getConnection() {
         try {
             if (null == conn || conn.isClosed()) {
                 Properties props = getProps();
                 conn = DriverManager
-                        .getConnection(props.getProperty("db.url"), props.getProperty("db.username"), props.getProperty("db.password"));
+                        .getConnection(props.getProperty("db.url"), props.getProperty("db.username"),
+                                props.getProperty("db.password"));
             }
         } catch (SQLException | IOException e) {
             e.printStackTrace();
@@ -49,5 +37,9 @@ public class Util {
         } catch (IOException | URISyntaxException e) {
             throw new IOException("Database config file not found", e);
         }
+    }
+
+    public static void closeConnection() throws SQLException {
+        conn.close();
     }
 }
