@@ -12,7 +12,6 @@ import java.util.Properties;
 
 public class Util {
     private static Connection conn = null;
-    private static Util instance = null;
 
     public static Connection getConnection() {
         try {
