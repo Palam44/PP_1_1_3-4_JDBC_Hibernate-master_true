@@ -1,27 +1,29 @@
 package jm.task.core.jdbc;
 
+import jm.task.core.jdbc.dao.UserDaoJDBCImpl;
 import jm.task.core.jdbc.service.UserService;
 import jm.task.core.jdbc.service.UserServiceImpl;
 
+import java.sql.SQLException;
+
 public class Main {
-    public final static UserService userService = new UserServiceImpl();
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
         // реализуйте алгоритм здесь
+        UserDaoJDBCImpl userDao = new UserDaoJDBCImpl();
 
-        userService.createUsersTable();
+        userDao.createUsersTable();
 
-        userService.saveUser("Антон", "Картон", (byte) 33);
-        userService.saveUser("Богдан", "Фонтан", (byte) 29);
-        userService.saveUser("Кирилл", "Курилл", (byte) 17);
-        userService.saveUser("Наташа", "Три_Рубля_И_Наша", (byte) 22);
+        userDao.saveUser("Антон", "Картон", (byte) 33);
+        userDao.saveUser("Богдан", "Фонтан", (byte) 29);
+        userDao.saveUser("Кирилл", "Курилл", (byte) 17);
+        userDao.saveUser("Наташа", "Три_Рубля_И_Наша", (byte) 22);
 
-        userService.removeUserById(2);
+        userDao.removeUserById(2);
 
-        userService.getAllUsers();
+        userDao.getAllUsers();
 
-        userService.cleanUsersTable();
+        userDao.cleanUsersTable();
 
-        userService.dropUsersTable();
+        userDao.dropUsersTable();
     }
 }
