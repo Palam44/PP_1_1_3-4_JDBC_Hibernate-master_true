@@ -42,8 +42,12 @@ public class Util {
 
     }
 
-    static {
-        try {
+
+    public static SessionFactory getHibernateSessionFactory() {
+
+        if (sessionFactory == null) {
+
+            try {
             // Свойства
             Properties properties = new Properties();
             properties.setProperty("hibernate.connection.driver_class",BD_DRIVERS );
@@ -60,10 +64,12 @@ public class Util {
             e.printStackTrace();
         }
     }
-
-    public static Session getHibernateSessionFactory() {
-        return sessionFactory.openSession();
+        return sessionFactory;
     }
+
+//    public static Session getHibernateSessionFactory() {
+//        return sessionFactory.openSession();
+//    }
 
 
     public static void closeConnection() {
