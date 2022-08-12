@@ -2,6 +2,7 @@ package jm.task.core.jdbc.util;
 
 import jm.task.core.jdbc.model.User;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
@@ -20,6 +21,8 @@ public class Util {
     private static final String BD_URL = "jdbc:mysql://localhost:3306/new_schema";
     private static final String BD_USER = "root";
     private static final String BD_PASSWORD = "DANEKpalam55";
+
+    private final static String DIALECT = "org.hibernate.dialect.MySQLDialect";
     private static Connection conn;
     private static SessionFactory sessionFactory;
 
@@ -39,36 +42,29 @@ public class Util {
 
     }
 
-    public static SessionFactory getHibernateSessionFactory() {
-
-        if (sessionFactory == null || !sessionFactory.isOpen()) {
-            try {
-                Configuration config = new Configuration();
-
-                Properties settings = new Properties();
-                settings.put(Environment.DRIVER, BD_DRIVERS);
-                settings.put(Environment.URL, BD_URL);
-                settings.put(Environment.USER, BD_USER);
-                settings.put(Environment.PASS, BD_PASSWORD);
-
-                settings.put(Environment.DIALECT, "org.hibernate.dialect.MySQL5Dialect");
-                settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
-                settings.put(Environment.SHOW_SQL, "true");
-                settings.put(Environment.FORMAT_SQL, "true");
-//                settings.put(Environment.HBM2DDL_AUTO, "create-drop");
-
-                config.setProperties(settings);
-                config.addAnnotatedClass(User.class);
-
-                ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(config.getProperties()).build();
-
-                sessionFactory = config.buildSessionFactory(serviceRegistry);
-            } catch (Exception se) {
-                se.printStackTrace();
-            }
+    static {
+        try {
+            // Свойства
+            Properties properties = new Properties();
+            properties.setProperty("hibernate.connection.driver_class",BD_DRIVERS );
+            properties.setProperty("hibernate.connection.url",BD_URL);
+            properties.setProperty("hibernate.connection.username",BD_USER);
+            properties.setProperty("hibernate.connection.password",BD_PASSWORD);
+            properties.setProperty("hibernate.dialect",DIALECT);
+            // Конфигурация и класс
+            Configuration configuration = new Configuration();
+            configuration.setProperties(properties);
+            configuration.addAnnotatedClass(User.class);
+            sessionFactory = configuration.buildSessionFactory();
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
-        return sessionFactory;
     }
+
+    public static Session getHibernateSessionFactory() {
+        return sessionFactory.openSession();
+    }
+
 
     public static void closeConnection() {
         try {
